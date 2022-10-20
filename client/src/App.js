@@ -3,25 +3,29 @@ import axios from 'axios';
 
 const App = () => {
   const [ allTransactions, setAllTransactions ] = useState(null);
+  const [ newTransactionAdd, setNewTransactionAdd ] = useState(0);
   const [item, setItems] = useState("");
   const [price, setPrice] = useState(0); 
   
-  useEffect(() => getAllTransactions(), []);
-
-  const getAllTransactions = () => {
+  useEffect(() => {
     axios
-    .get("http://localhost:3010/transactions")
-    .then((res) => {
-      setAllTransactions(res.data);
-    })
-    .catch((err) => console.log(err));
-  }
+      .get('http://localhost:3010/transactions')
+      .then(res => {
+        setAllTransactions(res.data);
+      })
+      .catch(err => {
+        console.log(err);
+      }
+    );
+  }, [newTransactionAdd] );
 
   const handleDelete = (id) => {
     axios
       .delete(`http://localhost:3010/transactions/${id}`)
+      .then((res) => {
+        setAllTransactions(allTransactions.filter(transaction => transaction.id !== id));
+      })
       .catch((err) => console.log(err));
-      getAllTransactions();
   };
 
   const handleSubmit = (e) => {
@@ -33,12 +37,12 @@ const App = () => {
         record_time: new Date(),
       })
       .then((res) => {
+        setNewTransactionAdd(newTransactionAdd + 1);
         console.log(res);
       })
       .catch((err) => console.log(err));
     setItems("");
     setPrice(0);
-    getAllTransactions();
   };
 
   const calculateTotal = () => {
